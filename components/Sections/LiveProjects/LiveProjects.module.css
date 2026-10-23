@@ -1,0 +1,166 @@
+.section {
+  position: relative;
+  width: 100%;
+  margin-top: -60px;
+  background: #242424;
+  color: #f4f4f4;
+  font-family: "Google Sans", "Segoe UI", sans-serif;
+}
+
+.pin {
+  position: relative;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 42%, rgba(255, 255, 255, 0.05), transparent 70%),
+    #242424;
+}
+
+.glow {
+  position: absolute;
+  inset: 18% 20% auto;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 68%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 78rem);
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.copy {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.5rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 0 24px rgba(36, 36, 36, 0.9);
+}
+
+.title {
+  max-width: 15ch;
+  margin: 0;
+  font-size: clamp(1.85rem, 4.2vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-wrap: balance;
+  text-shadow:
+    0 0 28px rgba(36, 36, 36, 0.95),
+    0 0 60px rgba(36, 36, 36, 0.85);
+}
+
+.support {
+  max-width: 32ch;
+  margin: 0;
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.62);
+  text-shadow: 0 0 24px rgba(36, 36, 36, 0.9);
+}
+
+.collage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  perspective: 1200px;
+}
+
+.card {
+  position: absolute;
+  margin: 0;
+  list-style: none;
+  border-radius: 1.05rem;
+  overflow: hidden;
+  background: #111;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 22px 50px rgba(0, 0, 0, 0.42);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.size_sm {
+  width: clamp(8.5rem, 14vw, 13.5rem);
+}
+
+.size_md {
+  width: clamp(10.5rem, 17vw, 16rem);
+}
+
+.size_lg {
+  width: clamp(12rem, 20vw, 18.5rem);
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .section {
+    margin-top: -40px;
+  }
+
+  .title {
+    max-width: 16ch;
+  }
+
+  .size_sm,
+  .size_md,
+  .size_lg {
+    width: clamp(7rem, 30vw, 10.5rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .copy {
+    padding-inline: 1rem;
+  }
+
+  .support {
+    max-width: 28ch;
+  }
+
+  .size_sm,
+  .size_md,
+  .size_lg {
+    width: clamp(6.25rem, 34vw, 8.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    will-change: auto;
+  }
+}

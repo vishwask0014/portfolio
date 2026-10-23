@@ -1,0 +1,115 @@
+.menuButton {
+  position: fixed;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  top: 58px;
+  left: 62px;
+  width: 33px;
+  height: 18px;
+  z-index: 1000;
+  cursor: pointer;
+  mix-blend-mode: exclusion;
+}
+
+.menuBars {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bar1 {
+  background-color: #fff;
+  width: 16px;
+  height: 2px;
+  position: relative;
+  margin: 0 0 2px 0;
+  transform-origin: center center;
+}
+
+.bar2 {
+  background-color: #fff;
+  width: 28px;
+  height: 2px;
+  position: relative;
+  margin: 2px 0;
+  transform-origin: center center;
+}
+
+.bar3 {
+  background-color: #fff;
+  width: 16px;
+  height: 2px;
+  position: relative;
+  left: 16px;
+  margin: 2px 0 0 0;
+  transform-origin: center center;
+}
+
+.nav {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 999;
+}
+
+.navCloseSmoothTransition {
+  transition: all ease-in-out .5s !important;
+}
+
+.nav section {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  position: fixed;
+}
+
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: center;
+}
+
+.menuItem {
+  opacity: 0;
+}
+
+.menuLink {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.menuLink:hover {
+  color: #666;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+}

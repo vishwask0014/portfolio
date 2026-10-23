@@ -1,0 +1,169 @@
+.skillsContainer {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background-color: #000;
+    /* background:
+        radial-gradient(1100px 560px at 78% 88%, rgba(0, 0, 0, 0.035), transparent 62%),
+        radial-gradient(900px 520px at 12% 12%, rgba(0, 0, 0, 0.02), transparent 58%),
+        #fff; */
+}
+
+.marquee {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 10;
+    width: calc(100% - min(52vw, 580px) - 4%);
+    padding: 40px 48px;
+    overflow: hidden;
+    transform: translateY(-50%);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.track {
+    display: flex;
+    width: max-content;
+    gap: 40px;
+    align-items: center;
+    will-change: transform;
+}
+
+.trackItem {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+}
+
+.img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    padding: 12px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 50%;
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.marqueeBG {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    max-height: 92vh !important;
+    width: auto !important;
+    height: 92vh !important;
+    object-fit: contain !important;
+    object-position: bottom center;
+    top: unset !important;
+    right: unset !important;
+    bottom: 0 !important;
+    left: var(--bg-left, 50%) !important;
+    transform: translateX(var(--bg-shift, -50%)) !important;
+}
+
+.orbit {
+    position: absolute;
+    right: calc(min(52vw, 580px) / -2);
+    top: 50%;
+    z-index: 10;
+    width: min(52vw, 580px);
+    height: min(52vw, 580px);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.orbitSvg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.orbitRing {
+    stroke: rgba(0, 0, 0, 0.05);
+    stroke-width: 24;
+}
+
+.orbitRingDots {
+    stroke: rgba(0, 0, 0, 0.28);
+    stroke-width: 2;
+    stroke-dasharray: 0.5 23.6;
+    stroke-linecap: round;
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: orbit-spin 120s linear infinite;
+}
+
+.orbitPath {
+    stroke: rgba(0, 0, 0, 0.16);
+    stroke-width: 1.25;
+    stroke-dasharray: 3 6;
+    fill: none;
+}
+
+@keyframes orbit-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.orbitItem {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 64px;
+    height: 64px;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+}
+
+.orbitItem .img {
+    width: 64px;
+    height: 64px;
+}
+
+@media (max-width: 768px) {
+    .marquee {
+        top: 16%;
+        width: 100%;
+        padding: 24px 20px;
+        transform: none;
+    }
+
+    .track {
+        gap: 22px;
+    }
+
+    .img,
+    .orbitItem,
+    .orbitItem .img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .img {
+        padding: 9px;
+    }
+
+    .orbit {
+        right: 50%;
+        top: 62%;
+        width: min(82vw, 360px);
+        height: min(82vw, 360px);
+        transform: translate(50%, -40%);
+    }
+
+    .marqueeBG {
+        max-height: 70vh !important;
+        height: 70vh !important;
+    }
+}
