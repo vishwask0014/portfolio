@@ -1,6 +1,8 @@
 import "./globals.css";
 import { Topbar } from "@/components/common/Topbar/Topbar";
 import SmoothScroll from "@/components/common/SmoothScroll/SmoothScroll";
+import SplashScreen from "@/components/common/SplashScreen/SplashScreen";
+import CustomCursor from "@/components/common/CustomCursor/CustomCursor";
 
 export const metadata = {
   title: "Vishwas Portfolio",
@@ -24,6 +26,8 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <SplashScreen />
+        <CustomCursor />
         <Topbar />
         {children}
         <SmoothScroll />

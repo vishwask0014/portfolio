@@ -1,56 +1,88 @@
 "use client";
 
-import React, { Suspense, useRef, useMemo, useEffect, useState } from "react";
-import { Canvas, useFrame, primitive } from "@react-three/fiber";
-import { useGLTF, SpotLight, Environment, Center } from "@react-three/drei";
-import { SpotLightHelper, SRGBColorSpace, PCFShadowMap, CanvasTexture, RepeatWrapping } from "three";
+import React, { Suspense, useRef, useMemo, useState } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { SpotLight, Environment } from "@react-three/drei";
+import {
+  SpotLightHelper,
+  SRGBColorSpace,
+  PCFShadowMap,
+  CanvasTexture,
+  RepeatWrapping,
+  TextureLoader,
+} from "three";
 import * as THREE from "three";
+import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader.js";
 import css from "./HeroSection.module.css";
 
-const MODEL_PATH = "/modal/scene.gltf";
+const MODEL_PATH = "/modal/Lucy100k.ply";
+const TEXTURE_PATH = "/modal/textures/disturb.jpg";
 const TARGET_SIZE = 2.8;
 
+function ensureUVs(geometry) {
+  if (geometry.attributes.uv) return geometry;
+
+  geometry.computeBoundingBox();
+  const { min, max } = geometry.boundingBox;
+  const size = new THREE.Vector3().subVectors(max, min);
+  const pos = geometry.attributes.position;
+  const uvs = new Float32Array(pos.count * 2);
+
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    uvs[i * 2] = size.x ? (x - min.x) / size.x : 0;
+    uvs[i * 2 + 1] = size.y ? (y - min.y) / size.y : 0;
+  }
+
+  geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+  return geometry;
+}
+
 function HeroMesh() {
-  const { scene } = useGLTF(MODEL_PATH);
-  const groupRef = useRef(null);
+  const geometry = useLoader(PLYLoader, MODEL_PATH);
+  const texture = useLoader(TextureLoader, TEXTURE_PATH);
 
   const prepared = useMemo(() => {
-    const clone = scene.clone(true);
-    clone.traverse((child) => {
-      if (!child.isMesh) return;
-      child.castShadow = true;
-      child.receiveShadow = true;
-      const materials = Array.isArray(child.material)
-        ? child.material
-        : [child.material];
-      materials.forEach((mat) => {
-        if (!mat) return;
-        mat.side = THREE.DoubleSide;
-        if ("metalness" in mat) mat.metalness = Math.min(mat.metalness ?? 0.4, 0.45);
-        if ("roughness" in mat) mat.roughness = Math.max(mat.roughness ?? 0.5, 0.4);
-        mat.needsUpdate = true;
-      });
-    });
+    const geo = ensureUVs(geometry.clone());
+    geo.scale(0.0024, 0.0024, 0.0024);
+    geo.computeVertexNormals();
+    geo.center();
 
-    const box = new THREE.Box3().setFromObject(clone);
+    const box = new THREE.Box3().setFromBufferAttribute(geo.attributes.position);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = TARGET_SIZE / maxDim;
 
-    return { clone, scale: TARGET_SIZE / maxDim };
-  }, [scene]);
+    return { geometry: geo, scale };
+  }, [geometry]);
 
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
-    groupRef.current.rotation.y = Math.sin(t * 0.35) * 0.2;
-    groupRef.current.position.y = Math.sin(t * 0.8) * 0.04;
-  });
+  useMemo(() => {
+    texture.colorSpace = SRGBColorSpace;
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.anisotropy = 8;
+    texture.needsUpdate = true;
+  }, [texture]);
 
   return (
-    <group ref={groupRef}>
-      <Center>
-        <primitive object={prepared.clone} scale={prepared.scale} />
-      </Center>
+        <group
+          // Stand upright, flipped front, tilted up + toward the right
+          rotation={[-Math.PI / 2 + 0.28, -0.55, 0]}
+          position={[0, 0.02, 0]}
+        >
+      <mesh
+        geometry={prepared.geometry}
+        scale={prepared.scale}
+        castShadow
+        receiveShadow
+      >
+        <meshStandardMaterial
+          map={texture}
+          roughness={0.55}
+          metalness={0.08}
+        />
+      </mesh>
     </group>
   );
 }
@@ -58,59 +90,22 @@ function HeroMesh() {
 function SpotLightSystem() {
   const spotLightRef = useRef();
   const [helper, setHelper] = useState(null);
+  const cookieTexture = useLoader(TextureLoader, TEXTURE_PATH);
 
-  // Create procedural cookie texture for spotlight pattern (gobo effect)
-  const cookieTexture = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-    
-    // Create a noise/disturb pattern similar to the three.js example
-    const imageData = ctx.createImageData(512, 512);
-    const data = imageData.data;
-    
-    for (let y = 0; y < 512; y++) {
-      for (let x = 0; x < 512; x++) {
-        const dx = (x - 256) / 256;
-        const dy = (y - 256) / 256;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        // Create circular gobo pattern with noise
-        let value = 0;
-        if (dist < 1) {
-          // Add some noise/disturbance
-          const noise = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 
-                       Math.sin(x * 0.05 + y * 0.05) * 0.5 + 0.5;
-          value = (1 - dist) * noise * 255;
-        }
-        
-        const i = (y * 512 + x) * 4;
-        data[i] = data[i + 1] = data[i + 2] = value;
-        data[i + 3] = 255;
-      }
-    }
-    
-    ctx.putImageData(imageData, 0, 0);
-    
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
-    texture.colorSpace = SRGBColorSpace;
-    
-    return texture;
-  }, []);
+  useMemo(() => {
+    cookieTexture.colorSpace = SRGBColorSpace;
+    cookieTexture.needsUpdate = true;
+  }, [cookieTexture]);
 
   useFrame((state) => {
     if (!spotLightRef.current) return;
     const t = state.clock.elapsedTime * 0.5;
     
-    spotLightRef.current.position.x = Math.cos(t) * 2.5;
-    spotLightRef.current.position.z = Math.sin(t) * 2.5;
-    spotLightRef.current.position.y = 5;
+    spotLightRef.current.position.x = Math.cos(t) * 3;
+    spotLightRef.current.position.z = Math.sin(t) * 3;
+    spotLightRef.current.position.y = 4;
     
-    spotLightRef.current.target.position.set(0, 1, 0);
+    spotLightRef.current.target.position.set(0, 0, 0);
     
     if (helper) {
       helper.update();
@@ -167,7 +162,7 @@ function Floor() {
     ctx.fillStyle = '#d4c4a8';
     ctx.fillRect(0, 0, size, size);
     
-    const texture = new THREE.CanvasTexture(canvas);
+    const texture = new CanvasTexture(canvas);
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
     texture.repeat.set(1, 1);
@@ -186,13 +181,11 @@ function Floor() {
   );
 }
 
-useGLTF.preload(MODEL_PATH);
-
 export default function HeroModel() {
   return (
     <div className={css.canvasWrap}>
       <Canvas
-        camera={{ position: [0, 1.2, 4.2], fov: 40 }}
+        camera={{ position: [0, 2, 5], fov: 50 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 1.75]}
         shadows
@@ -204,9 +197,9 @@ export default function HeroModel() {
           gl.shadowMap.type = PCFShadowMap;
         }}
       >
-        <SpotLightSystem />
         <Floor />
         <Suspense fallback={null}>
+          <SpotLightSystem />
           <HeroMesh />
         </Suspense>
         <Environment preset="city" />
