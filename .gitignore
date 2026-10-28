@@ -21,7 +21,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*
 
 # vercel
 .vercel
@@ -34,7 +33,6 @@ next-env.d.ts
 .cache
 
 # IDE
-.vscode
 .idea
 *.swp
 *.swo
@@ -52,3 +50,4 @@ bun.lockb.gz.br.gz
 bun.lockb.gz.br.gz.br
 bun.lockb.gz.br.gz.br.gz
 bun.lockb.gz.br.gz.br.gz.br
+config.bat

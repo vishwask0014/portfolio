@@ -1,19 +1,74 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 import css from "./HeroSection.module.css";
 
-function Letters({ text, className }) {
+const SERVICES = [
+  "UI UX",
+  "Prototype",
+  "Wireframe",
+  // "Strategies",
+  // "Content",
+  "UI Integration",
+  "SEO",
+  "AEO",
+  "GEO",
+  "Performance Optimization",
+  "Creatives",
+  "Social Media",
+  "Posts",
+  "Reels",
+  // "Video",
+];
+
+/** Center → edges: bold orange into warm red */
+const GRADIENT = ["#FFAC1C", "#FF8F1F", "#FF6B2E", "#F03A2E", "#D42020"];
+
+const colorTween = {
+  type: "tween",
+  duration: 0.22,
+  ease: "easeOut",
+};
+
+function Letters({ text, className, idleColor = "#ececec" }) {
+  const [active, setActive] = useState(null);
+  const chars = Array.from(text);
+
+  const getAnim = (index) => {
+    if (active === null || chars[index] === " ") {
+      return { color: idleColor };
+    }
+
+    const dist = Math.abs(index - active);
+    if (dist > 4) return { color: idleColor };
+
+    return {
+      color: GRADIENT[Math.min(dist, GRADIENT.length - 1)],
+    };
+  };
+
   return (
-    <span className={className}>
-      {Array.from(text).map((char, index) =>
+    <span
+      className={`${css.letters} ${className || ""}`.trim()}
+      onMouseLeave={() => setActive(null)}
+    >
+      {chars.map((char, index) =>
         char === " " ? (
           <span key={`space-${index}`} className={css.space}>
             {"\u00A0"}
           </span>
         ) : (
-          <span key={`${char}-${index}`} className={css.letter}>
+          <motion.span
+            key={`${char}-${index}`}
+            className={css.letter}
+            animate={getAnim(index)}
+            transition={colorTween}
+            onMouseEnter={() => setActive(index)}
+          >
             {char}
-          </span>
+          </motion.span>
         )
       )}
     </span>
@@ -23,33 +78,39 @@ function Letters({ text, className }) {
 export default function HeroSection() {
   return (
     <section className={css.hero} aria-label="Introduction">
-      <a href="#contact" className={css.topCta}>
-        Get in touch
-      </a>
+      <div className={css.bg} aria-hidden="true">
+        <Image
+          src="/img/hero/neon-portrait.jpg"
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 900px) 100vw, 60vw"
+          className={css.bgImage}
+        />
+        <div className={css.bgFade} />
+      </div>
 
       <div className={css.content}>
-        <p className={css.badge}>Frontend systems with product taste</p>
+        <h5 className={css.intro}>
+          <Letters text="Hi, I'm Vishwas." idleColor="rgba(236, 236, 236, 0.78)" />
+        </h5>
 
         <h1 className={css.headline}>
           <span className={css.line}>
-            <Letters text="Hi, I'm" />
-            <span className={css.chipAvatar} aria-hidden="true">
-              V
-            </span>
-            <Letters text="Vishwas." />
+            <Letters text="I design, grow, and" />
           </span>
           <span className={css.line}>
-            <Letters text="I build" />
-            <span className={css.chipDot} aria-hidden="true" />
-            <Letters text="systems" />
-          </span>
-          <span className={css.line}>
-            <Letters text="that help" />
-            <Letters text="products" className={css.underline} />
-            <span className={css.chipThumb} aria-hidden="true" />
-            <Letters text="grow." />
+            <Letters text="get brands seen." />
           </span>
         </h1>
+
+        <ul className={css.services} aria-label="Services">
+          {SERVICES.map((service) => (
+            <li key={service} className={css.serviceItem}>
+              {service}
+            </li>
+          ))}
+        </ul>
 
         <a href="#contact" className={css.connect}>
           Connect
@@ -58,7 +119,7 @@ export default function HeroSection() {
 
       <div className={css.scrollHint}>
         <span className={css.scrollMouse} aria-hidden="true" />
-        <p className={css.scrollLabel}>Scroll to enter selected work</p>
+        <p className={css.scrollLabel}>Scroll Down</p>
       </div>
     </section>
   );

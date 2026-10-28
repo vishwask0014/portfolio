@@ -3,6 +3,7 @@ import { Topbar } from "@/components/common/Topbar/Topbar";
 import SmoothScroll from "@/components/common/SmoothScroll/SmoothScroll";
 import SplashScreen from "@/components/common/SplashScreen/SplashScreen";
 import CustomCursor from "@/components/common/CustomCursor/CustomCursor";
+import ContactFloat from "@/components/common/ContactFloat/ContactFloat";
 
 export const metadata = {
   title: "Vishwas Portfolio",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         <CustomCursor />
         <Topbar />
         {children}
+        <ContactFloat />
         <SmoothScroll />
       </body>
     </html>
